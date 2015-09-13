@@ -114,7 +114,7 @@
 				hubicService.getFile(path).then(function (blob) {
 					window.saveAs(blob, vm.getName(file));
 				}, function (reason) {
-					toaster.pop("error", "", file.name + " cannot be opened.", 5000);
+					toaster.pop("error", "", vm.getName(file) + " cannot be opened.", 5000);
 				}).finally(function () {
 					$("#pleaseWaitDialog").modal("hide");
 				});
@@ -225,9 +225,9 @@
 					empty: true
 				});
 				$("#addForm").modal("hide");
-				toaster.pop("success", "", vm.newFile + " file is created.", 5000);
+				toaster.pop("success", "", vm.newFilename + " file is added.", 5000);
 			}, function (reason) {
-				toaster.pop("error", "", vm.newFile + " file cannot be created.", 5000);
+				toaster.pop("error", "", vm.newFilename + " file cannot be added.", 5000);
 			}, function (update) {
 				progress.css("width", (update) + "%");
 				progress.text((update) + "% sent");
@@ -265,28 +265,29 @@
 			});
 
 			vm.pathList = pathList;
-
-			$("#addForm").on("change", "#encrypt-input", function (e) {
-				$scope.$apply(function () {
-					vm.newFile = e.target.files[0];
-					vm.newFilename = vm.newFile.name;
-				});
-			});
-	
-			$("#addForm").on("hidden.bs.modal", function (e) {
-				var progress = $("#sendProgress");
-				if (!progress.parent().hasClass("hidden")) {
-					progress.parent().addClass("hidden");
-				}
-	
-				vm.newFilename = null;
-				vm.encrypt = false;
-			});
-	
-			$("#createForm").on("shown.bs.modal", function (e) {
-				$("#new-name").focus();
-			});
 		}
+		
+		$("#addForm").on("change", "#encrypt-input", function (e) {
+			$scope.$apply(function () {
+				vm.newFile = e.target.files[0];
+				vm.newFilename = vm.newFile.name;
+			});
+		});
+
+		$("#addForm").on("hidden.bs.modal", function (e) {
+			var progress = $("#sendProgress");
+			if (!progress.parent().hasClass("hidden")) {
+				progress.parent().addClass("hidden");
+			}
+
+			vm.newFilename = null;
+			vm.encrypt = false;
+		});
+
+		$("#createForm").on("shown.bs.modal", function (e) {
+			$("#new-name").focus();
+		});
+		
 		init();
 	}
 })();
