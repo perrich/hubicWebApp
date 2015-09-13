@@ -1,0 +1,9 @@
+{
+	"logfile": "log.txt",
+	"client_id": "api_hubic_zzzzzzzzzzzzzzz",
+	"client_secret": "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx",
+	"base_uri": "http://localhost/index.php",
+	"encrypted_file_ext": ".encrypted",
+	"encryption_key": "2015-myKey",
+	"session_encryption_key": "ENCRYPTION_KEY"
+}

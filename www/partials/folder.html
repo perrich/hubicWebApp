@@ -1,0 +1,139 @@
+﻿<div>
+	<div style="padding: 10px">
+			<div class="btn-group">
+				<button class="btn btn-primary btn-lg dropdown-toggle folder-button" type="button" id="dropdownMenu1" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true" ng-disabled="folder.folder === '' || !folder.loaded">
+					Folder: <i class="fa fa-home" ng-if="folder.pathList[folder.pathList.length-1].label == ''"></i>{{folder.pathList[folder.pathList.length-1].label}}
+					<span class="badge">{{folder.pathList.length}}</span>
+				</button>
+				<ul class="dropdown-menu" aria-labelledby="dropdownMenu1">
+					<li ng-repeat="path in folder.pathList | orderBy:path.pos:true" ng-class="{ disabled: $first }">
+					<a ng-href="#{{ path.path }}" class="margin-right-xs"><i class="fa fa-home" ng-if="path.label == ''"></i>{{path.label}}</a>
+					</li>
+				</ul>
+			</div>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#createForm" ng-disabled="!folder.loaded"><i class="fa fa-plus"></i> New</button>
+			<button type="button" class="btn btn-default" data-toggle="modal" data-target="#deleteForm" ng-disabled="folder.folder === '' || !folder.loaded"><i class="fa fa-trash"></i> Delete</button>
+		</div>
+	</div>
+	<table class="table table-hover">
+		<thead>
+			<tr>
+				<th style="width: 10%">Type</th>
+				<th>Name</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr ng-repeat="file in folder.files | orderBy: ['-type', 'name']" ng-click="folder.openPath(file)" context-menu="folder.menuOptions">
+				<td><i class="{{folder.getType(file)}}"><i class="fa fa-key" style="margin-left: 5px" ng-show="file.encrypted"></i></td>
+				<td>{{folder.getName(file)}}</td>
+			</tr>
+			<tr ng-show="folder.loaded && folder.files.length === 0">
+				<td />
+				<td>Empty folder</td>
+			</tr>
+			<tr ng-show="folder.loaded">
+				<td />
+				<td>
+					<button type="button" class="btn btn-default" data-toggle="modal" data-target="#addForm"><i class="fa fa-cloud-upload"></i> Upload file</button>
+				</td>
+			</tr>
+			<tr ng-show="!folder.loaded">
+				<td />
+				<td><i class="fa fa-refresh fa-spin"></i> Loading contents...</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
+
+<div id="contextMenu" class="dropdown clearfix">
+	<ul class="dropdown-menu" role="menu" style="display:block;position:static;margin-bottom:5px;">
+		<li><a tabindex="-1" href="#">Open</a></li>
+		<li class="divider"></li>
+		<li><a tabindex="-1" href="#">Rename</a></li>
+		<li><a tabindex="-1" href="#">Delete</a></li>
+	</ul>
+</div>
+
+<div class="modal fade" id="createForm">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="folder.processing"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Create new folder</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<input type="text" class="form-control" id="new-name" ng-model="folder.newName" placeholder="Enter the new folder name key here" ng-disabled="folder.processing">
+				</div>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="folder.processing">Close</button>
+				<button type="button" class="btn btn-primary" ng-click="folder.createFolder()"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i> Create</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="deleteForm">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="folder.processing"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Delete current folder</h4>
+			</div>
+			<div class="modal-body">
+				<p>Are you sure to delete the &quot;{{folder.folder}}&quot; folder?</p>
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="folder.processing">No</button>
+				<button type="button" class="btn btn-primary" ng-click="folder.deleteFolder()"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i> Yes</button>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="modal fade" id="addForm">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close" ng-disabled="folder.processing"><span aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title">Add a new file</h4>
+			</div>
+			<div class="modal-body">
+				<div class="form-group">
+					<button type="button" class="btn btn-primary" ng-click="folder.chooseFile()" ng-disabled="folder.processing">Choose file</button>
+				</div>
+				<div class="form-group">
+					<input type="text" class="form-control" ng-model="folder.newFilename" placeholder="Enter the wanted name" ng-disabled="folder.processing">
+				</div>
+				<div class="checkbox">
+					<label>
+						<input type="checkbox" ng-model="folder.encrypt" checked ng-disabled="folder.processing"> Encrypt file
+					</label>
+				</div>
+				<div class="progress progress-striped hidden">
+					<div id="sendProgress" class="progress-bar" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%">0% sent</div>
+				</div>
+				<input type="file" id="encrypt-input" />
+			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="folder.processing">Close</button>
+				<button type="button" class="btn btn-primary" ng-click="folder.addFile()"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i>Add</button>
+			</div>
+		</div>
+	</div>
+</div>
+<div class="modal fadeonly" id="pleaseWaitDialog" data-backdrop="static" data-keyboard="false">
+	<div class="modal-dialog">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h3>Processing...</h3>
+			</div>
+			<div class="modal-body">
+				<div class="progress progress-striped active">
+					<div class="progress-bar" style="width: 100%;"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>

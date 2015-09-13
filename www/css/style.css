@@ -1,0 +1,45 @@
+body {
+    padding-top: 50px;
+}
+
+input[type=file]{
+	display: none;
+}
+
+#contextMenu {
+  position: absolute;
+  display: none;
+}
+
+.vertical-align {
+    display: flex;
+    align-items: center;
+}
+
+.transparent {
+	background-color: transparent;
+}
+
+.modal.fadeonly .modal-dialog {
+  -webkit-transform: translate(0, 0%);
+  -ms-transform: translate(0, 0%);
+  transform: translate(0, 0%);
+  -webkit-transition: -webkit-transform 0.3s ease-out;
+  -moz-transition: -moz-transform 0.3s ease-out;
+  -o-transition: -o-transform 0.3s ease-out;
+  transition: transform 0.3s ease-out;
+}
+
+.folder-button {
+	min-width: 300px;
+	margin-right: 10px;
+	text-align: left;
+}
+
+table {
+    font-size: 14px;
+}
+
+.dropdown-menu {
+    font-size: 14px;
+}

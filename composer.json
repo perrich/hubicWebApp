@@ -1,0 +1,9 @@
+{
+    "require": {
+        "rackspace/php-opencloud": "^1.15",
+        "league/oauth2-client": "^1.0",
+        "phroute/phroute": "^2.0",
+        "monolog/monolog": "^1.17",
+        "noodlehaus/config": "^0.8.2"
+    }
+}
