@@ -68,7 +68,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="folder.processing">Close</button>
-				<button type="button" class="btn btn-primary" ng-click="folder.createFolder()"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i> Create</button>
+				<button type="button" class="btn btn-primary" ng-click="folder.createFolder()" ng-disabled="folder.newName === null || folder.processing"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i> Create</button>
 			</div>
 		</div>
 	</div>
@@ -104,7 +104,7 @@
 					<button type="button" class="btn btn-primary" ng-click="folder.chooseFile()" ng-disabled="folder.processing">Choose file</button>
 				</div>
 				<div class="form-group">
-					<input type="text" class="form-control" ng-model="folder.newFilename" placeholder="Enter the wanted name" ng-disabled="folder.processing">
+					<input type="text" class="form-control" ng-model="folder.newFilename" placeholder="Enter the wanted name" ng-disabled="folder.processing || folder.newFile === null">
 				</div>
 				<div class="checkbox">
 					<label>
@@ -118,7 +118,7 @@
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-default" data-dismiss="modal" ng-disabled="folder.processing">Close</button>
-				<button type="button" class="btn btn-primary" ng-click="folder.addFile()"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i>Add</button>
+				<button type="button" class="btn btn-primary" ng-click="folder.addFile()" ng-disabled="folder.newFile === null || folder.processing"><i class="fa fa-spinner fa-pulse" ng-show="folder.processing"></i> Add</button>
 			</div>
 		</div>
 	</div>

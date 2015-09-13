@@ -28,6 +28,8 @@
 		vm.loaded = false;
 		vm.files = [];
 		vm.newFile = null;
+		vm.newName = null;
+		vm.newFilename = null;
 
 		vm.getType = getType;
 		vm.getName = getName;
@@ -64,7 +66,7 @@
 			$location.path("/folder/" + encodePath(path));
 		}
 
-		this.menuOptions = [
+		vm.menuOptions = [
 			["Delete", function ($itemScope) {
 				deletePath($itemScope.file).then(function () {
 					getFolder();
@@ -109,60 +111,51 @@
 
 			if (file.type == "folder") {
 				openFolder(path);
-			} else if (file.type == "file") {
-				$("#pleaseWaitDialog").modal("show");
-				hubicService.getFile(path).then(function (blob) {
-					window.saveAs(blob, vm.getName(file));
-				}, function (reason) {
-					toaster.pop("error", "", vm.getName(file) + " cannot be opened.", 5000);
-				}).finally(function () {
-					$("#pleaseWaitDialog").modal("hide");
-				});
+				return;
 			}
+			
+			$("#pleaseWaitDialog").modal("show");
+			hubicService.getFile(path).then(function (blob) {
+				window.saveAs(blob, vm.getName(file));
+			}, function (reason) {
+				toaster.pop("error", "", vm.getName(file) + " cannot be opened.", 5000);
+			}).finally(function () {
+				$("#pleaseWaitDialog").modal("hide");
+			});
 		}
 
 		function deletePath(file) {
 			var deferred = $q.defer();
 			$("#pleaseWaitDialog").modal("show");
 
-			if (file.type == "folder") {
-				var path = getFullPath(file.name);
-				hubicService.deleteFolder(path).then(function (data) {
-					deferred.resolve(data);
-				}, function (data) {
-					deferred.reject("not done");
-				}).finally(function () {
-					$("#pleaseWaitDialog").modal("hide");
-				});
-			} else if (file.type == "file") {
-				hubicService.deleteFile(file.name).then(function (data) {
-					deferred.resolve(data);
-				}, function (data) {
-					deferred.reject("not done");
-				}).finally(function () {
-					$("#pleaseWaitDialog").modal("hide");
-				});
-			}
+			var path = getFullPath(file.name);
+			var promise = (file.type == "folder") ? hubicService.deleteFolder(path) : hubicService.deleteFile(path);
+				
+			promise.then(function (data) {
+				deferred.resolve(data);
+			}, function (data) {
+				deferred.reject("not done");
+			}).finally(function () {
+				$("#pleaseWaitDialog").modal("hide");
+			});
 
 			return deferred.promise;
 		}
 
 		function renamePath(file) {
 			var deferred = $q.defer();
+			vm.processing = true;
 
-			if (file.type == "folder") {
-				hubicService.renameFolder(file.name).then(function (data) {
-					deferred.resolve(data);
-				}, function (data) {
-					deferred.reject("not done");
-				});
-			} else if (file.type == "file") {
-				hubicService.renameFile(file.name).then(function (data) {
-					deferred.resolve(data);
-				}, function (data) {
-					deferred.reject("not done");
-				});
-			}
+			var path = getFullPath(file.name);
+			var promise = (file.type == "folder") ? hubicService.renameFolder(path) : hubicService.renameFile(path);
+				
+			promise.then(function (data) {
+				deferred.resolve(data);
+			}, function (data) {
+				deferred.reject("not done");
+			}).finally(function () {
+				vm.processing = false;
+			});
 
 			return deferred.promise;
 		}
@@ -197,6 +190,7 @@
 					empty: true
 				});
 				$("#createForm").modal("hide");
+				vm.newName = null;
 				toaster.pop("success", "", vm.newName + " folder is created.", 5000);
 			}, function (reason) {
 				toaster.pop("error", "", vm.newName + " folder cannot be created.", 5000);
@@ -280,8 +274,11 @@
 				progress.parent().addClass("hidden");
 			}
 
-			vm.newFilename = null;
-			vm.encrypt = false;
+			$scope.$apply(function () {
+				vm.newFile = null;
+				vm.newFilename = null;
+				vm.encrypt = false;
+			});
 		});
 
 		$("#createForm").on("shown.bs.modal", function (e) {
