@@ -212,12 +212,23 @@
 			vm.processing = true;
 
 			hubicService.addFile(path, vm.newFile, vm.encrypt).then(function () {
-				vm.files.unshift({
-					name: hubicService.getFilename(vm.newFilename, vm.encrypt),
-					type: "file",
-					encrypted: vm.encrypt === true,
-					empty: true
+				var filename = hubicService.getFilename(vm.newFilename, vm.encrypt);
+				var old_file = null;
+				angular.forEach(vm.files, function (file) {
+					if (file.name === filename && file.type === "file") {
+						old_file = file;
+					}
 				});
+				if (old_file === null) {
+					vm.files.unshift({
+						name: filename,
+						type: "file",
+						encrypted: vm.encrypt === true,
+						empty: true
+					});
+				} else {
+					old_file.encrypted = (vm.encrypt === true);
+				}
 				$("#addForm").modal("hide");
 				toaster.pop("success", "", vm.newFilename + " file is added.", 5000);
 			}, function (reason) {
@@ -283,6 +294,10 @@
 
 		$("#createForm").on("shown.bs.modal", function (e) {
 			$("#new-name").focus();
+		});
+		
+		$(".modal-dialog").draggable({
+			handle: ".modal-header"
 		});
 		
 		init();
