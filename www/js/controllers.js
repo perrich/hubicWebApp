@@ -272,7 +272,7 @@
 			vm.pathList = pathList;
 		}
 		
-		$("#addForm").on("change", "#encrypt-input", function (e) {
+		$("#encrypt-input").on("change", function (e) {
 			$scope.$apply(function () {
 				vm.newFile = e.target.files[0];
 				vm.newFilename = vm.newFile.name;
